@@ -7,7 +7,7 @@ import java.util.List;
  * Production
  */
 public class Production {
-    private List<Product> list = new ArrayList<>();
+    public List<Product> list = new ArrayList<>();
     public Production() {
         super();
     }

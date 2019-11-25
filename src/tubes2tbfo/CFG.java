@@ -10,8 +10,10 @@ import java.util.List;
  */
 public class CFG {
     public List<Rule> rules;
-    public CFG(List<Rule> rules) {
+    public Variable startVariable;
+    public CFG(List<Rule> rules, Variable startVariable) {
         this.rules = rules;
+        this.startVariable = startVariable;
     }
 
     public static CFG readFile(File file) throws Exception {
@@ -31,6 +33,6 @@ public class CFG {
             }
             ++lineInfo;
         }
-        return new CFG(list);
+        return new CFG(list, list.size() > 0 ? list.get(0).variable : null);
     }
 }

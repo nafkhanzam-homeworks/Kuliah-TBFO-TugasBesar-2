@@ -6,8 +6,8 @@ import java.util.List;
  * CNF
  */
 public class CNF extends CFG {
-    private CNF(List<Rule> list) {
-        super(list);
+    private CNF(List<Rule> list, Variable startVariable) {
+        super(list, startVariable);
     }
 
     public static CNF toCNF(CFG cfg) {
@@ -15,11 +15,25 @@ public class CNF extends CFG {
         step2_deleteUnitProductions(cfg);
         step3_deleteUselessVariables(cfg);
         step4_changeForm(cfg);
-        return new CNF(cfg.rules);
+        return new CNF(cfg.rules, cfg.startVariable);
     }
 
     private static void step1_deleteEpsilonProductions(CFG cfg) {
-        
+        boolean foundEpsilon = false;
+        do {
+            foundEpsilon = false;
+            for (Rule rule : cfg.rules) {
+                for (int index = 0; index < rule.production.list.size(); ++index) {
+                    Product product = rule.production.list.get(index);
+                    if (product.list.contains(Symbol.EPSILON)) {
+                        foundEpsilon = true;
+                        rule.production.list.remove(index);
+                        // TODO: ADD THE COMBINATION OF DELETED PRODUCT TO PRODUCTION
+                    }
+                }
+            }
+        } while (foundEpsilon);
+        // TODO: ADD GET_PRODUCTION BY VARIABLE IN PRODUCTION.JAVA, AND THEN THE CHECKING WETHER THAT PRODUCTION WILL PRODUCT EPSILON OR NOT CAN BE DONE RECURSIVELY!
     }
 
     private static void step2_deleteUnitProductions(CFG cfg) {
