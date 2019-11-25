@@ -37,14 +37,14 @@ public class CNF extends CFG {
     }
 
     private static void step2_deleteUnitProductions(CFG cfg) {
-
+        // TODO: IMPLEMENT
     }
 
     private static void step3_deleteUselessVariables(CFG cfg) {
-
+        // TODO: IMPLEMENT
     }
 
     private static void step4_changeForm(CFG cfg) {
-
+        // TODO: IMPLEMENT
     }
 }
