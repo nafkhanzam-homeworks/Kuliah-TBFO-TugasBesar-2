@@ -5,8 +5,9 @@ import java.io.*;
 
 public class CFG {
     public HashMap<Variable, List<Product>> rules = new HashMap<>();
+    public List<Variable> variables = new ArrayList<>();
 
-    public static CFG getCFG(File file) throws Exception {
+    public static CFG createCFG(File file) throws Exception {
         try {
             StringBuilder sb = new StringBuilder();
             FileReader r = new FileReader(file);
@@ -15,29 +16,38 @@ public class CFG {
                 sb.append(c);
             }
             r.close();
-            return getCFG(sb.toString().split("\n"));
+            return createCFG(sb.toString().split("\n"));
         } catch (Exception e) {
             throw e;
         }
     }
 
-    public static CFG getCFG(String[] content) {
-        for (String s : content) {
+    public static CFG createCFG(String[] content) {
+        CFG res = new CFG();
+        for (int line = 1; line <= content.length; ++line) {
+            String s = content[line-1];
             s = s.trim();
-            if (s.isBlank() || s.startsWith("//")) {
+            if (s.isBlank() || s.startsWith("#")) {
                 continue;
             }
             String[] strs = s.replaceAll(" +", " ").split(" ");
             if (strs.length < 3 || !strs[1].equals("->")) {
-                throw new RuntimeException("Syntax is not correct :( !");
+                throw new RuntimeException("Syntax is not correct :( ! (line: " + line + ")");
             }
-            String var = strs[0];
-            List<List<String>> cfgs = new ArrayList<>();
+            List<Product> list = new ArrayList<>();
+            Product prod = new Product();
             for (int i = 2; i < strs.length; ++i) {
-                List<String> list = new ArrayList<>();
-                
+                if (strs[i].equals("|")) {
+                    list.add(prod);
+                    prod = new Product();
+                } else {
+                    prod.products.add(strs[i]);
+                }
             }
+            var v = new Variable(strs[0]);
+            res.rules.put(v, list);
+            res.variables.add(v);
         }
-        return null;
+        return res;
     }
 }
