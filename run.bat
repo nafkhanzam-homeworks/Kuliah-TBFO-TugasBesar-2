@@ -1,1 +1,1 @@
-compile.bat && java -cp ./bin/ tubes.Main
+compile.bat && java -cp ./bin/ tubes2tbfo.Main

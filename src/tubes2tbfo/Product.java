@@ -1,32 +1,33 @@
 package tubes2tbfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Product
+ */
 public class Product {
-    List<String> products = new ArrayList<>();
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((products == null) ? 0 : products.hashCode());
-        return result;
+    public static final String SPACE_CODE = "<&sp>";
+    public List<Symbol> list = new ArrayList<>();
+    public Product() {
+        super();
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Product other = (Product) obj;
-        if (products == null) {
-            if (other.products != null)
-                return false;
-        } else if (!products.equals(other.products))
-            return false;
-        return true;
+    public static Product stringToProduct(String str) {
+        Product res = new Product();
+        String[] strs = str.split(" ");
+        Symbol symbol;
+        for (String s : strs) {
+            if (s.equals("\"") || s.isBlank()) {
+                continue;
+            }
+            if (s.startsWith("\"") && s.endsWith("\"")) {
+                symbol = new Terminal(s.substring(1, s.length()-1).replace(SPACE_CODE, " "));
+            } else {
+                symbol = new Variable(s);
+            }
+            res.list.add(symbol);
+        }
+        return res;
     }
 }
