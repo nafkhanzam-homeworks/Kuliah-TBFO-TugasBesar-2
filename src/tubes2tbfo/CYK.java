@@ -9,7 +9,7 @@ public class CYK {
         this.cnf = cnf;
     }
     public boolean test(String str) {
-
+        str = str.replaceAll("\n", " ");
         return false;
     }
 }
