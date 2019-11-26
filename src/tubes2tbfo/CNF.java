@@ -104,7 +104,8 @@ public class CNF extends CFG {
          * variabel untuk tiap right hand side.
          */
         HashMap<Product, Rule> map = new HashMap<>();
-        for (Rule rule : cfg.rules) {
+        for (int j = 0; j < cfg.rules.size(); ++j) {
+            Rule rule = cfg.rules.get(j);
             Iterator<Product> iter = rule.production.list.iterator();
             List<Product> toAdd = new ArrayList<>();
             while (iter.hasNext()) {
@@ -126,21 +127,21 @@ public class CNF extends CFG {
                         toReplace.list.add(var);
                     }
                     toAdd.add(toReplace);
-                } else {
-                    iter.remove();
+                    --j;
+                } else if (prod.list.size() == 2) {
                     for (int i = 0; i < prod.list.size(); ++i) {
                         Symbol sym = prod.list.get(i);
                         if (sym instanceof Variable) {
                             continue;
                         }
                         Terminal t = (Terminal)sym;
-                        Product toReplace = new Product();
+                        Variable toReplace = null;
                         Product check = new Product();
                         check.list.add(t);
                         if (map.containsKey(check)) {
-                            toReplace.list.add(map.get(check).variable);
+                            toReplace = map.get(check).variable;
                         } else {
-                            Variable var = cfg.getResulting(t);
+                            Variable var = cfg.getResultingSingle(t);
                             if (var == null) {
                                 var = new Variable(UUID.randomUUID().toString());
                                 Production newProduction = new Production();
@@ -151,14 +152,13 @@ public class CNF extends CFG {
                                 cfg.rules.add(newRule);
                                 map.put(newProduct, newRule);
                             }
-                            toReplace.list.add(var);
+                            if (!rule.variable.equals(var)) {
+                                toReplace = var;
+                            }
                         }
-                        if (i == 0) {
-                            toReplace.list.add(0, prod.list.get(0));
-                        } else {
-                            toReplace.list.add(prod.list.get(1));
+                        if (toReplace != null) {
+                            prod.list.set(i, toReplace);
                         }
-                        toAdd.add(toReplace);
                     }
                 }
             }

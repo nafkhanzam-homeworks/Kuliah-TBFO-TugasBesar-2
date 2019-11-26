@@ -68,7 +68,8 @@ public class CFG {
     }
 
     private Map<Pair<Variable, Variable>, List<Variable>> dp = new HashMap<>();
-    private Map<Terminal, Variable> dpTerminal = new HashMap<>();
+    private Map<Terminal, Variable> dpTerminalSingle = new HashMap<>();
+    private Map<Terminal, List<Variable>> dpTerminal = new HashMap<>();
     public List<Variable> getResulting(Variable a, Variable b) {
         Pair<Variable, Variable> pair = new Pair<>(a, b);
         if (dp.containsKey(pair)) { // Dynamic Programming...
@@ -87,18 +88,37 @@ public class CFG {
         return res;
     }
 
-    public Variable getResulting(Terminal t) {
+    public List<Variable> getResulting(Terminal t) {
         /**
          * Mencari dan mengembalikan Rules yang memiliki product yang dicari
          */
         if (dpTerminal.containsKey(t)) { // Dynamic Programming...
             return dpTerminal.get(t);
         }
+        List<Variable> res = new ArrayList<>();
         Product product = new Product();
         product.list.add(t);
         for (Rule rule : rules) {
             if (rule.production.containsProduct(product)) {
-                dpTerminal.put(t, rule.variable);
+                res.add(rule.variable);
+            }
+        }
+        dpTerminal.put(t, res);
+        return res;
+    }
+
+    public Variable getResultingSingle(Terminal t) {
+        /**
+         * Mencari dan mengembalikan Rules yang memiliki product yang dicari
+         */
+        if (dpTerminalSingle.containsKey(t)) { // Dynamic Programming...
+            return dpTerminalSingle.get(t);
+        }
+        Product product = new Product();
+        product.list.add(t);
+        for (Rule rule : rules) {
+            if (rule.production.containsProduct(product)) {
+                dpTerminalSingle.put(t, rule.variable);
                 return rule.variable;
             }
         }

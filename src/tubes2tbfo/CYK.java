@@ -26,10 +26,10 @@ public class CYK {
             }
         }
         char[] chars = str.toCharArray();
-        for (int i = n-1; i > 0; --i) {
+        for (int i = n-1; i >= 0; --i) {
             for (int j = 0; j <= i; ++j) {
                 if (i == n-1) {
-                    gram[i][j].add(cnf.getResulting(new Terminal(chars[j])));
+                    gram[i][j].addAll(cnf.getResulting(new Terminal(chars[j])));
                 } else {
                     List<Variable> comb = gram[i][j];
                     for (int k = 0; k < n-i-1; ++k) {
@@ -38,12 +38,10 @@ public class CYK {
                 }
             }
         }
-        printGram(gram);
-        System.out.println(String.join(",", str.split("")));
-        return !gram[0][0].isEmpty();
+        return gram[0][0].contains(cnf.startVariable);
     }
 
-    public void printGram(List<Variable>[][] gram) {
+    public void printGram() {
         int i = 0;
         for (List<Variable>[] line : gram) {
             printLineGram(line, i++); System.out.println();

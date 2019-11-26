@@ -47,11 +47,14 @@ public class Main {
         System.out.println(YELLOW + "Context Free Grammar: " + NORMAL + cfgFileName);
         int i = 0, succeed = 0;
         for (File file : files) {
-            boolean res = cyk.test(Files.readString(file.toPath()));
+            String str = Files.readString(file.toPath());
+            boolean res = cyk.test(str);
             System.out.println((res ? GREEN : RED) + (++i) + ". " + (res ? "SUCCEED" : "FAILED") + " - " + file.getName() + NORMAL);
             if (res) {
                 ++succeed;
             }
+            cyk.printGram();
+            System.out.println(String.join(",", str.split("")));
         }
         System.out.println(YELLOW + "============================================" + NORMAL);
         System.out.println(YELLOW + "SUCCEED: " + GREEN + succeed + NORMAL);
