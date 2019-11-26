@@ -5,7 +5,7 @@ package tubes2tbfo;
  */
 public class Terminal extends Symbol {
 
-    public Terminal(String value) {
+    public Terminal(char value) {
         super(value);
     }
 

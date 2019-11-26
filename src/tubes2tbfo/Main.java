@@ -18,7 +18,7 @@ public class Main {
         System.out.print("Input CFG name: ");
         String cfgFileName = scan.nextLine();
         try {
-            CYK cyk = new CYK(CNF.toCNF(CFG.readFile(new File(cfgFileName + ".cfg"))));
+            CYK cyk = new CYK(CNF.toCNF(CFG.readFile(new File("data/" + cfgFileName + ".cfg"))));
             testFiles(cyk, cfgFileName);
         } catch (NoSuchFileException e) {
             System.err.println("File/folder not found!");
@@ -29,7 +29,7 @@ public class Main {
     }
 
     public static void testFiles(CYK cyk, String cfgFileName) throws Exception {
-        File[] files = new File(cfgFileName).listFiles();
+        File[] files = new File("data/" + cfgFileName).listFiles();
         cfgFileName += ".cfg";
         System.out.println(YELLOW + "================ TEST FILES ================" + NORMAL);
         System.out.println(YELLOW + "Context Free Grammar: " + NORMAL + cfgFileName);

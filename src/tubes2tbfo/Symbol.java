@@ -6,21 +6,21 @@ import java.util.Objects;
  * Symbol
  */
 public class Symbol {
-    public static final Terminal EPSILON = new Terminal("e");
-    public String value;
-    public Symbol(String value) {
+    public static final Terminal EPSILON = new Terminal((char)0);
+    public Object value;
+    public Symbol(Object value) {
         this.value = value;
     }
 
-    public String getValue() {
+    public Object getValue() {
         return this.value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 
-    public Symbol value(String value) {
+    public Symbol value(Object value) {
         this.value = value;
         return this;
     }

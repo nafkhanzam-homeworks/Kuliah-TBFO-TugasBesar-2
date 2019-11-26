@@ -1,6 +1,9 @@
 package tubes2tbfo;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * CNF
@@ -34,6 +37,7 @@ public class CNF extends CFG {
             }
         } while (foundEpsilon);
         // TODO: ADD GET_PRODUCTION BY VARIABLE IN PRODUCTION.JAVA, AND THEN THE CHECKING WETHER THAT PRODUCTION WILL PRODUCT EPSILON OR NOT CAN BE DONE RECURSIVELY!
+        
     }
 
     private static void step2_deleteUnitProductions(CFG cfg) {
@@ -46,5 +50,16 @@ public class CNF extends CFG {
 
     private static void step4_changeForm(CFG cfg) {
         // TODO: IMPLEMENT
+    }
+
+    private Map<Pair<Variable, Variable>, List<Variable>> dp = new HashMap<>();
+    public List<Variable> getResulting(Variable a, Variable b) {
+        Pair<Variable, Variable> pair = new Pair<>(a, b);
+        if (dp.containsKey(pair)) {
+            return dp.get(pair);
+        }
+        List<Variable> res = new ArrayList<>();
+        
+        return res;
     }
 }
