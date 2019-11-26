@@ -25,7 +25,7 @@ public class Production {
                 str += c;
             }
         }
-        String[] strs = str.split(" | ");
+        String[] strs = str.split(" \\| ");
         Production res = new Production();
         for (String s : strs) {
             res.addProduct(Product.stringToProduct(s));
@@ -33,7 +33,7 @@ public class Production {
         return res;
     }
     public void addProduct(Product product) {
-        if (containsProduct(product)) {
+        if (!containsProduct(product)) {
             list.add(product);
         }
     }

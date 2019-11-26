@@ -3,12 +3,20 @@ package tubes2tbfo;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.StandardOpenOption;
 import java.util.Scanner;
 
 /**
  * Main
  */
 public class Main {
+    /**
+     * Fungsi akan membaca grammar CFG lalu mengkonversikan menjadi CNF. Setelah menjadi CNF,
+     * fungsi akan mengaplikasikan algoritma CYK. Jika file berhasil dicompile, maka akan
+     * mengeluarkan tulisan "SUCCEED" warna hijau, jika tidak, akan mengeluarkan tulisan "FAILED"
+     * berwarna merah.
+     */
+    
     private static final String RED = "\033[31m";
     private static final String GREEN = "\033[32m";
     private static final String YELLOW = "\033[33m";
@@ -18,12 +26,15 @@ public class Main {
         System.out.print("Input CFG name: ");
         String cfgFileName = scan.nextLine();
         try {
-            CYK cyk = new CYK(CNF.toCNF(CFG.readFile(new File("data/" + cfgFileName + ".cfg"))));
+            CFG cfg = CFG.readFile(new File("data/" + cfgFileName + ".cfg"));
+            CNF cnf = CNF.toCNF(cfg);
+            Files.writeString(new File("data/" + cfgFileName + ".cnf").toPath(), cnf.toString(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+            CYK cyk = new CYK(cnf);
             testFiles(cyk, cfgFileName);
         } catch (NoSuchFileException e) {
             System.err.println("File/folder not found!");
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
         scan.close();
     }
@@ -32,6 +43,7 @@ public class Main {
         File[] files = new File("data/" + cfgFileName).listFiles();
         cfgFileName += ".cfg";
         System.out.println(YELLOW + "================ TEST FILES ================" + NORMAL);
+        System.out.print(cyk.cnf);
         System.out.println(YELLOW + "Context Free Grammar: " + NORMAL + cfgFileName);
         int i = 0, succeed = 0;
         for (File file : files) {

@@ -43,8 +43,10 @@ public class Symbol {
 
     @Override
     public String toString() {
-        return "{" +
-            " value='" + getValue() + "'" +
-            "}";
+        String res = value.toString();
+        if (value instanceof Character) {
+            res = "\"" + res + "\"";
+        }
+        return res;
     }
 }
