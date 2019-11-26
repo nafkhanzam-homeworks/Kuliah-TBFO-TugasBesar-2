@@ -25,7 +25,6 @@ public class Production {
                 str += c;
             }
         }
-        System.err.println("DEBUG: " + str);
         String[] strs = str.split(" \\| ");
         Production res = new Production();
         for (String s : strs) {

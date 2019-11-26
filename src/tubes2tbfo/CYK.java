@@ -1,7 +1,9 @@
 package tubes2tbfo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * CYK
@@ -66,11 +68,18 @@ public class CYK {
         System.out.print("]");
     }
 
+    private Map<Pair<List<Variable>, List<Variable>>, List<Variable>> dp = new HashMap<>();
     public void comb(List<Variable> res, List<Variable> aList, List<Variable> bList) {
+        Pair<List<Variable>, List<Variable>> pair = new Pair<>(new ArrayList<>(aList), new ArrayList<>(bList));
+        if (dp.containsKey(pair)) {
+            res.addAll(dp.get(pair));
+            return;
+        }
         for (int i = 0; i < aList.size(); ++i) {
             for (int j = 0; j < bList.size(); ++j) {
                 res.addAll(cnf.getResulting(aList.get(i), bList.get(j)));
             }
         }
+        dp.put(pair, new ArrayList<>(res));
     }
 }

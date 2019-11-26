@@ -1,2 +1,2 @@
 ./compile.sh
-java -cp ./bin/ tubes2tbfo.Main
+java -cp ./bin/ tubes2tbfo.Main $1

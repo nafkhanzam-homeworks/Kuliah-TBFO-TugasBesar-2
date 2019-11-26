@@ -23,14 +23,17 @@ public class Main {
     private static final String NORMAL = "\033[0m";
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
-        System.out.print("Input CFG name: ");
-        String cfgFileName = scan.nextLine();
+        String cfgFileName = args.length > 0 ? args[0] : null;
+        if (cfgFileName == null) {
+            System.out.print("Input CFG name: ");
+            cfgFileName = scan.nextLine();
+        }
         try {
             CFG cfg = CFG.readFile(new File("data/" + cfgFileName + ".cfg"));
             CNF cnf = CNF.toCNF(cfg);
             Files.writeString(new File("data/" + cfgFileName + ".cnf").toPath(), cnf.toString(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
             CYK cyk = new CYK(cnf);
-            testFiles(cyk, cfgFileName);
+            testFiles(cyk, cfgFileName, cfgFileName.equalsIgnoreCase("test"));
         } catch (NoSuchFileException e) {
             System.err.println("File/folder not found!");
         } catch (Exception e) {
@@ -39,22 +42,26 @@ public class Main {
         scan.close();
     }
 
-    public static void testFiles(CYK cyk, String cfgFileName) throws Exception {
+    public static void testFiles(CYK cyk, String cfgFileName, boolean smallTest) throws Exception {
         File[] files = new File("data/" + cfgFileName).listFiles();
         cfgFileName += ".cfg";
         System.out.println(YELLOW + "================ TEST FILES ================" + NORMAL);
-        System.out.print(cyk.cnf);
+        if (smallTest) {
+            System.out.print(cyk.cnf);
+        }
         System.out.println(YELLOW + "Context Free Grammar: " + NORMAL + cfgFileName);
         int i = 0, succeed = 0;
         for (File file : files) {
             String str = Files.readString(file.toPath());
             boolean res = cyk.test(str);
-            System.out.println((res ? GREEN : RED) + (++i) + ". " + (res ? "SUCCEED" : "FAILED") + " - " + file.getName() + NORMAL);
+            System.out.println((res ? GREEN : RED) + ++i + ". " + (res ? "SUCCEED" : "FAILED") + " - " + file.getName() + NORMAL);
             if (res) {
                 ++succeed;
             }
-            cyk.printGram();
-            System.out.println(String.join(",", str.split("")));
+            if (smallTest) {
+                cyk.printGram();
+                System.out.println(String.join(",", str.split("")));
+            }
         }
         System.out.println(YELLOW + "============================================" + NORMAL);
         System.out.println(YELLOW + "SUCCEED: " + GREEN + succeed + NORMAL);

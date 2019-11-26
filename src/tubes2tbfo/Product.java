@@ -8,13 +8,14 @@ import java.util.List;
  */
 public class Product {
     public static final String SPACE_CODE = "<sp>";
+    public static final String ENTER_CODE = "<br>";
     public List<Symbol> list = new ArrayList<>();
     public Product() {
         super();
     }
 
     private static String _replaceEncoding(String s) {
-        return s.replace(SPACE_CODE, " ");
+        return s.replace(SPACE_CODE, " ").replace(ENTER_CODE, "\n");
     }
 
     public static Product stringToProduct(String str) {
