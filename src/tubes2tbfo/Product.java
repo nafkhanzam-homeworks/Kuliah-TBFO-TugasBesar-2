@@ -25,9 +25,9 @@ public class Product {
             if (s.isBlank()) {
                 continue;
             }
-            if (s.startsWith("\"") && s.endsWith("\"")) {
-                if (s.equals("\"\"")) {
-                    res.list.add(new Terminal((char)0));
+            if (s.startsWith("\"") && s.endsWith("\"") && s.length() > 1) {
+                if (s.length() == 2) {
+                    res.list.add(new Terminal((char)Symbol.EPSILON.value));
                 } else {
                     s = _replaceEncoding(s);
                     for (char c : s.substring(1, s.length()-1).toCharArray()) {

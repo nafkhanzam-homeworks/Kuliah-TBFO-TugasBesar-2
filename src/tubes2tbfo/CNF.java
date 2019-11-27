@@ -1,11 +1,11 @@
 package tubes2tbfo;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -20,7 +20,7 @@ public class CNF extends CFG {
         /**
          * Mengubah CFG menjadi CNF
          */
-        // step1_deleteEpsilonProductions(cfg);
+        step1_deleteEpsilonProductions(cfg);
         step2_deleteUnitProductions(cfg);
         step3_deleteUselessVariables(cfg);
         step4_changeForm(cfg);
@@ -29,26 +29,63 @@ public class CNF extends CFG {
 
     private static void step1_deleteEpsilonProductions(CFG cfg) {
         /**
-         * Menghilangkan semua produksi ε.
-         * Variabel yang dapat menghasilkan ε ditentukan terlebih dahulu, lalu semua produksi ditelusuri
-         * dan untuk setiap produksi semua subset yang berpeluang menjadi variabel kosong
-         * dihilangkan.
+         * Menghilangkan semua produksi ε. Variabel yang dapat menghasilkan ε ditentukan
+         * terlebih dahulu, lalu semua produksi ditelusuri dan untuk setiap produksi
+         * semua subset yang berpeluang menjadi variabel kosong dihilangkan.
          */
         boolean foundEpsilon = false;
         do {
             foundEpsilon = false;
             for (Rule rule : cfg.rules) {
-                for (int index = 0; index < rule.production.list.size(); ++index) {
-                    Product product = rule.production.list.get(index);
-                    if (product.list.get(0).equals(Symbol.EPSILON)) {
+                Iterator<Product> iter = rule.production.list.iterator();
+                while (iter.hasNext()) {
+                    Product product = iter.next();
+                    if (product.list.size() == 0 && product.list.get(0).equals(Symbol.EPSILON)) {
                         foundEpsilon = true;
-                        rule.production.list.remove(index);
-                        // TODO: ADD THE COMBINATION OF DELETED PRODUCT TO PRODUCTION
+                        iter.remove();
+                        for (Rule rule2 : cfg.rules) {
+                            List<Product> toAdd = new ArrayList<>();
+                            for (Product product2 : rule2.production.list) {
+                                if (product2.list.contains(rule.variable)) {
+                                    toAdd.addAll(_permutate(product2, rule.variable));
+                                }
+                            }
+                            for (Product add : toAdd) {
+                                rule2.production.addProduct(add);
+                            }
+                        }
                     }
                 }
             }
         } while (foundEpsilon);
-        // TODO: ADD GET_PRODUCTION BY VARIABLE IN PRODUCTION.JAVA, AND THEN THE CHECKING WETHER THAT PRODUCTION WILL PRODUCT EPSILON OR NOT CAN BE DONE RECURSIVELY!
+    }
+
+    private static List<Product> _permutate(Product product, Variable variable) {
+        List<Product> res = new ArrayList<>();
+        int n = 0;
+        for (Symbol sym : product.list) {
+            if (sym.equals(variable)) {
+                ++n;
+            }
+        }
+        for (int i = 1; i < (1 << n); ++i) {
+            char[] comb = String.format("%" + n + "s", Integer.toBinaryString(i)).replace(' ', '0').toCharArray();
+            Product newProd = new Product();
+            int j = 0;
+            for (Symbol sym : product.list) {
+                Symbol newSym = new Symbol(sym.value);
+                if (sym.equals(variable)) {
+                    if (comb[j] == '0') {
+                        newProd.list.add(newSym);
+                    }
+                    ++j;
+                } else {
+                    newProd.list.add(newSym);
+                }
+            }
+            res.add(newProd);
+        }
+        return res;
     }
 
     private static void step2_deleteUnitProductions(CFG cfg) {

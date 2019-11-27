@@ -19,7 +19,6 @@ public class CYK {
     @SuppressWarnings("unchecked")
     public boolean test(String str) {
         // str = str.replaceAll("\n", " ");
-        // TODO: IMPLEMENT CYK
         int n = str.length();
         gram = new List[n][n];
         for (int i = 0; i < n; ++i) {
@@ -33,9 +32,8 @@ public class CYK {
                 if (i == n-1) {
                     gram[i][j].addAll(cnf.getResulting(new Terminal(chars[j])));
                 } else {
-                    List<Variable> comb = gram[i][j];
                     for (int k = 0; k < n-i-1; ++k) {
-                        comb(comb, gram[n-k-1][j], gram[i+k+1][j+k+1]);
+                        permutate(gram[i][j], gram[n-k-1][j], gram[i+k+1][j+k+1]);
                     }
                 }
             }
@@ -69,15 +67,23 @@ public class CYK {
     }
 
     private Map<Pair<List<Variable>, List<Variable>>, List<Variable>> dp = new HashMap<>();
-    public void comb(List<Variable> res, List<Variable> aList, List<Variable> bList) {
+    public void permutate(List<Variable> res, List<Variable> aList, List<Variable> bList) {
         Pair<List<Variable>, List<Variable>> pair = new Pair<>(new ArrayList<>(aList), new ArrayList<>(bList));
         if (dp.containsKey(pair)) {
-            res.addAll(dp.get(pair));
+            for (Variable v : dp.get(pair)) {
+                if (!res.contains(v)) {
+                    res.add(v);
+                }
+            }
             return;
         }
         for (int i = 0; i < aList.size(); ++i) {
             for (int j = 0; j < bList.size(); ++j) {
-                res.addAll(cnf.getResulting(aList.get(i), bList.get(j)));
+                for (Variable v : cnf.getResulting(aList.get(i), bList.get(j))) {
+                    if (!res.contains(v)) {
+                        res.add(v);
+                    }
+                }
             }
         }
         dp.put(pair, new ArrayList<>(res));
