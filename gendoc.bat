@@ -1,1 +1,0 @@
-javadoc -d ./docs/ -sourcepath ./src/ -subpackages tubes -private

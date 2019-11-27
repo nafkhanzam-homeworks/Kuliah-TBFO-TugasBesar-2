@@ -1,7 +1,6 @@
 package tubes2tbfo;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -101,7 +100,11 @@ public class CNF extends CFG {
                 if (prod.list.size() == 1 && prod.list.get(0) instanceof Variable) {
                     iter.remove();
                     Variable var = (Variable)prod.list.get(0);
-                    for (Product prodMove : cfg.getProduction(var).list) {
+                    Production production = cfg.getProduction(var);
+                    if (production == null) {
+                        throw new RuntimeException("Variable " + var + " has no rule!");
+                    }
+                    for (Product prodMove : production.list) {
                         toAdd.add(prodMove);
                     }
                 }
