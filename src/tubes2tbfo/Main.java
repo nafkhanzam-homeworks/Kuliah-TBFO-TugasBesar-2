@@ -33,7 +33,7 @@ public class Main {
             CNF cnf = CNF.toCNF(cfg);
             Files.writeString(new File("data/" + cfgFileName + ".cnf").toPath(), cnf.toString(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
             CYK cyk = new CYK(cnf);
-            testFiles(cyk, cfgFileName, cfgFileName.equalsIgnoreCase("test"));
+            testFiles(cyk, cfgFileName, args.length > 1);
         } catch (NoSuchFileException e) {
             System.err.println("File/folder not found!");
         } catch (Exception e) {
@@ -43,11 +43,12 @@ public class Main {
     }
 
     public static void testFiles(CYK cyk, String cfgFileName, boolean smallTest) throws Exception {
+        System.out.println(smallTest);
         File[] files = new File("data/" + cfgFileName).listFiles();
         cfgFileName += ".cfg";
         System.out.println(YELLOW + "================ TEST FILES ================" + NORMAL);
         if (smallTest) {
-            System.out.print(cyk.cnf);
+            // System.out.print(cyk.cnf);
         }
         System.out.println(YELLOW + "Context Free Grammar: " + NORMAL + cfgFileName);
         int i = 0, succeed = 0;

@@ -21,7 +21,7 @@ public class CNF extends CFG {
          */
         step1_deleteEpsilonProductions(cfg);
         step2_deleteUnitProductions(cfg);
-        step3_deleteUselessVariables(cfg);
+        // step3_deleteUselessVariables(cfg);
         step4_changeForm(cfg);
         return new CNF(cfg.rules, cfg.startVariable);
     }
@@ -39,10 +39,13 @@ public class CNF extends CFG {
                 Iterator<Product> iter = rule.production.list.iterator();
                 while (iter.hasNext()) {
                     Product product = iter.next();
-                    if (product.list.size() == 0 && product.list.get(0).equals(Symbol.EPSILON)) {
+                    if (product.list.size() == 1 && product.list.get(0).equals(Symbol.EPSILON)) {
                         foundEpsilon = true;
                         iter.remove();
                         for (Rule rule2 : cfg.rules) {
+                            if (rule.equals(rule2)) {
+                                continue;
+                            }
                             List<Product> toAdd = new ArrayList<>();
                             for (Product product2 : rule2.production.list) {
                                 if (product2.list.contains(rule.variable)) {
@@ -72,7 +75,10 @@ public class CNF extends CFG {
             Product newProd = new Product();
             int j = 0;
             for (Symbol sym : product.list) {
-                Symbol newSym = new Symbol(sym.value);
+                if (sym instanceof Terminal) {
+                    continue;
+                }
+                Variable newSym = new Variable((String)sym.value);
                 if (sym.equals(variable)) {
                     if (comb[j] == '0') {
                         newProd.list.add(newSym);
@@ -82,7 +88,9 @@ public class CNF extends CFG {
                     newProd.list.add(newSym);
                 }
             }
-            res.add(newProd);
+            if (!newProd.list.isEmpty()) {
+                res.add(newProd);
+            }
         }
         return res;
     }
@@ -185,7 +193,6 @@ public class CNF extends CFG {
                             if (sym instanceof Variable) {
                                 continue;
                             }
-                            found = true;
                             Terminal t = (Terminal)sym;
                             Variable toReplace = null;
                             Product check = new Product();
@@ -203,18 +210,23 @@ public class CNF extends CFG {
                                     Rule newRule = new Rule(var, newProduction);
                                     cfg.rules.add(newRule);
                                     map.put(newProduct, newRule);
+                                    found = true;
+                                } else if (prod.list.size() == 1 && rule.production.list.size() > 1) {
+                                    found = false;
                                 }
                                 if (!rule.variable.equals(var)) {
                                     toReplace = var;
                                 }
                             }
-                            if (toReplace != null) {
+                            if (toReplace != null && !(prod.list.size() == 1 && rule.production.list.size() > 1)) {
                                 prod.list.set(i, toReplace);
                             }
                         }
                     }
                 }
-                rule.production.list.addAll(toAdd);
+                if (found) {
+                    rule.production.list.addAll(toAdd);
+                }
             }
         } while (found);
     }
