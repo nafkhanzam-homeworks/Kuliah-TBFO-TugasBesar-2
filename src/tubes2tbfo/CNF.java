@@ -21,7 +21,7 @@ public class CNF extends CFG {
          */
         step1_deleteEpsilonProductions(cfg);
         step2_deleteUnitProductions(cfg);
-        // step3_deleteUselessVariables(cfg);
+        step3_deleteUselessVariables(cfg);
         step4_changeForm(cfg);
         return new CNF(cfg.rules, cfg.startVariable);
     }
