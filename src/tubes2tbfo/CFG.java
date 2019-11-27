@@ -122,7 +122,7 @@ public class CFG {
         Product product = new Product();
         product.list.add(t);
         for (Rule rule : rules) {
-            if (rule.production.containsProduct(product)) {
+            if (rule.production.containsProduct(product) && rule.production.list.size() == 1) {
                 dpTerminalSingle.put(t, rule.variable);
                 return rule.variable;
             }

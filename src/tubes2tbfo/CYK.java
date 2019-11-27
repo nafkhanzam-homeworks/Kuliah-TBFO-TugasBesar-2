@@ -20,6 +20,8 @@ public class CYK {
     public boolean test(String str) {
         // str = str.replaceAll("\n", " ");
         int n = str.length();
+        if (n == 0)
+            return true;
         gram = new List[n][n];
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j <= i; ++j) {

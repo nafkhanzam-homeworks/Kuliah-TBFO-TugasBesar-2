@@ -92,25 +92,32 @@ public class CNF extends CFG {
          * Menghilangkan variabel unit produksi. Semua produksi dimana right hand side adalah
          * salah satu dari variabelnya dihilangkan
          */
-        for (Rule rule : cfg.rules) {
-            Iterator<Product> iter = rule.production.list.iterator();
-            List<Product> toAdd = new ArrayList<>();
-            while (iter.hasNext()) {
-                Product prod = iter.next();
-                if (prod.list.size() == 1 && prod.list.get(0) instanceof Variable) {
-                    iter.remove();
-                    Variable var = (Variable)prod.list.get(0);
-                    Production production = cfg.getProduction(var);
-                    if (production == null) {
-                        throw new RuntimeException("Variable " + var + " has no rule!");
-                    }
-                    for (Product prodMove : production.list) {
-                        toAdd.add(prodMove);
+        boolean stillFound = false;
+        do {
+            stillFound = false;
+            for (Rule rule : cfg.rules) {
+                Iterator<Product> iter = rule.production.list.iterator();
+                List<Product> toAdd = new ArrayList<>();
+                while (iter.hasNext()) {
+                    Product prod = iter.next();
+                    if (prod.list.size() == 1 && prod.list.get(0) instanceof Variable) {
+                        stillFound = true;
+                        iter.remove();
+                        Variable var = (Variable)prod.list.get(0);
+                        Production production = cfg.getProduction(var);
+                        if (production == null) {
+                            throw new RuntimeException("Variable " + var + " has no rule!");
+                        }
+                        for (Product prodMove : production.list) {
+                            toAdd.add(prodMove);
+                        }
                     }
                 }
+                for (Product prod : toAdd) {
+                    rule.production.addProduct(prod);
+                }
             }
-            rule.production.list.addAll(toAdd);
-        }
+        } while (stillFound);
     }
 
     private static void step3_deleteUselessVariables(CFG cfg) {
@@ -144,65 +151,71 @@ public class CNF extends CFG {
          * variabel untuk tiap right hand side.
          */
         HashMap<Product, Rule> map = new HashMap<>();
-        for (int j = 0; j < cfg.rules.size(); ++j) {
-            Rule rule = cfg.rules.get(j);
-            Iterator<Product> iter = rule.production.list.iterator();
-            List<Product> toAdd = new ArrayList<>();
-            while (iter.hasNext()) {
-                Product prod = iter.next();
-                if (prod.list.size() > 2) {
-                    iter.remove();
-                    Product newProduct = prod.subProduct(1);
-                    Product toReplace = new Product();
-                    toReplace.list.add(prod.list.get(0));
-                    if (map.containsKey(newProduct)) {
-                        toReplace.list.add(map.get(newProduct).variable);
-                    } else {
-                        Variable var = new Variable(UUID.randomUUID().toString());
-                        Production newProduction = new Production();
-                        newProduction.addProduct(newProduct);
-                        Rule newRule = new Rule(var, newProduction);
-                        cfg.rules.add(newRule);
-                        map.put(newProduct, newRule);
-                        toReplace.list.add(var);
-                    }
-                    toAdd.add(toReplace);
-                    --j;
-                } else if (prod.list.size() == 2) {
-                    for (int i = 0; i < prod.list.size(); ++i) {
-                        Symbol sym = prod.list.get(i);
-                        if (sym instanceof Variable) {
-                            continue;
-                        }
-                        Terminal t = (Terminal)sym;
-                        Variable toReplace = null;
-                        Product check = new Product();
-                        check.list.add(t);
-                        if (map.containsKey(check)) {
-                            toReplace = map.get(check).variable;
+        boolean found = false;
+        do {
+            found = false;
+            for (int j = 0; j < cfg.rules.size(); ++j) {
+                Rule rule = cfg.rules.get(j);
+                Iterator<Product> iter = rule.production.list.iterator();
+                List<Product> toAdd = new ArrayList<>();
+                while (iter.hasNext()) {
+                    Product prod = iter.next();
+                    if (prod.list.size() > 2) {
+                        iter.remove();
+                        found = true;
+                        Product newProduct = prod.subProduct(1);
+                        Product toReplace = new Product();
+                        toReplace.list.add(prod.list.get(0));
+                        if (map.containsKey(newProduct)) {
+                            toReplace.list.add(map.get(newProduct).variable);
                         } else {
-                            Variable var = cfg.getResultingSingle(t);
-                            if (var == null) {
-                                var = new Variable(UUID.randomUUID().toString());
-                                Production newProduction = new Production();
-                                Product newProduct = new Product();
-                                newProduct.list.add(t);
-                                newProduction.addProduct(newProduct);
-                                Rule newRule = new Rule(var, newProduction);
-                                cfg.rules.add(newRule);
-                                map.put(newProduct, newRule);
-                            }
-                            if (!rule.variable.equals(var)) {
-                                toReplace = var;
-                            }
+                            Variable var = new Variable(UUID.randomUUID().toString());
+                            Production newProduction = new Production();
+                            newProduction.addProduct(newProduct);
+                            Rule newRule = new Rule(var, newProduction);
+                            cfg.rules.add(newRule);
+                            map.put(newProduct, newRule);
+                            toReplace.list.add(var);
                         }
-                        if (toReplace != null) {
-                            prod.list.set(i, toReplace);
+                        toAdd.add(toReplace);
+                        // --j;
+                    } else if (prod.list.size() == 2 || prod.list.size() == 1 && rule.production.list.size() > 1) {
+                        for (int i = 0; i < prod.list.size(); ++i) {
+                            Symbol sym = prod.list.get(i);
+                            if (sym instanceof Variable) {
+                                continue;
+                            }
+                            found = true;
+                            Terminal t = (Terminal)sym;
+                            Variable toReplace = null;
+                            Product check = new Product();
+                            check.list.add(t);
+                            if (map.containsKey(check)) {
+                                toReplace = map.get(check).variable;
+                            } else {
+                                Variable var = cfg.getResultingSingle(t);
+                                if (var == null) {
+                                    var = new Variable(UUID.randomUUID().toString());
+                                    Production newProduction = new Production();
+                                    Product newProduct = new Product();
+                                    newProduct.list.add(t);
+                                    newProduction.addProduct(newProduct);
+                                    Rule newRule = new Rule(var, newProduction);
+                                    cfg.rules.add(newRule);
+                                    map.put(newProduct, newRule);
+                                }
+                                if (!rule.variable.equals(var)) {
+                                    toReplace = var;
+                                }
+                            }
+                            if (toReplace != null) {
+                                prod.list.set(i, toReplace);
+                            }
                         }
                     }
                 }
+                rule.production.list.addAll(toAdd);
             }
-            rule.production.list.addAll(toAdd);
-        }
+        } while (found);
     }
 }
