@@ -5,3 +5,8 @@ C -> "a"
 D -> "b"
 E -> "c"
 F -> A D
+-4368-8744-b0874ba78819 c509da2d-f5a6-4dad-9b26-6dfce3d04f33
+B -> A 021f394f-cdfc-4368-8744-b0874ba78819 | "b"
+021f394f-cdfc-4368-8744-b0874ba78819 -> "a"
+5180e9b6-bc9d-4861-aa6d-d28bfb9bbfde -> "b"
+c509da2d-f5a6-4dad-9b26-6dfce3d04f33 -> B B
