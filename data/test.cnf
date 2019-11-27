@@ -5,8 +5,3 @@ C -> "a"
 D -> "b"
 E -> "c"
 F -> A D
-b6e
-e64051c7-6758-4e74-9621-943ad8a66b6e -> ecf6e923-1cf9-42f1-98d7-99bee58bcfaa dc6902e2-7d64-4801-af0a-110eb5137334
-ecf6e923-1cf9-42f1-98d7-99bee58bcfaa -> "b"
-dc6902e2-7d64-4801-af0a-110eb5137334 -> "c"
-5419f8f1-a401-4cb9-8db3-a95c22301ceb -> "a"
